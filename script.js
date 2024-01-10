@@ -68,22 +68,24 @@ loadMusic();
 
 nextButton.addEventListener("click", () => {
   if (index < songDataBase.length - 1) {
-    loadMusic(index++);
-    play();
+    index++;
   } else {
     index = 0;
-    loadMusic(index);
-    play();
   }
+  loadMusic();
+  play();
 });
+
 previousButton.addEventListener("click", () => {
   if (index > 0) {
-    loadMusic(index--);
-    play();
+    index--;
   } else {
-    pause();
+    index = songDataBase.length - 1;
   }
+  loadMusic();
+  play();
 });
+
 
 const play = () => {
   isPlaying = true;
