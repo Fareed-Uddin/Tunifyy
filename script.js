@@ -52,16 +52,15 @@ const loadMusic = () => {
   songName.textContent = songDataBase[index].title;
   songImgAtTheTop.src = songDataBase[index].imgSrc;
 };
+
 audio.addEventListener("ended", () => {
   if (index < songDataBase.length - 1) {
-    loadMusic(index++);
-    play();
+    index++;
   } else {
-    // If it's the last song, reset index to 0
     index = 0;
-    loadMusic(index);
-    play();
   }
+  loadMusic();
+  play();
 });
 
 loadMusic();
@@ -86,13 +85,20 @@ previousButton.addEventListener("click", () => {
   play();
 });
 
-
 const play = () => {
   isPlaying = true;
-  audio.play();
-  playPauseButton.classList.replace("fa-play", "fa-pause");
-  songImg.classList.add("anime");
+  const playPromise = audio.play();
+
+  if (playPromise !== undefined) {
+    playPromise.then(_ => {
+      playPauseButton.classList.replace("fa-play", "fa-pause");
+      songImg.classList.add("anime");
+    }).catch(error => {
+      console.error("Autoplay failed:", error.message);
+    });
+  }
 };
+
 const pause = () => {
   isPlaying = false;
   audio.pause();
@@ -107,7 +113,7 @@ playPauseButton.addEventListener("click", () => {
     play();
   }
 });
-let minute, second;
+
 const timeStamp = (event) => {
   let { duration, currentTime } = event.srcElement;
   const full_second = Math.floor(duration % 60);
@@ -123,7 +129,9 @@ const timeStamp = (event) => {
   const percentage = (currentTime / duration) * 100;
   meter.style.width = `${percentage}%`;
 };
+
 audio.addEventListener("timeupdate", timeStamp);
+
 progressBar.addEventListener("click", (event) => {
   const { duration } = audio;
   const moreProgress =
@@ -140,6 +148,7 @@ mainCard.addEventListener("mouseover", (event) => {
   songImg.style.transform = `rotate(${xAxis}deg)`;
   controlButtons.style.transform = `rotate(${xAxis}deg)`;
 });
+
 mainCard.addEventListener("mouseleave", () => {
   mainCard.style.transform = "rotateX(0deg) rotateY(0deg)";
   songImg.style.transform = "rotate(0deg)";
